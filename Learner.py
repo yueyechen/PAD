@@ -36,7 +36,7 @@ class face_learner(object):
     def get_model_input_data(self, imgs):
         return torch.cat((imgs[0], imgs[1], imgs[2]), dim=1).cuda()  # for rgb+depth+ir
 
-    def get_model_input_data_for_test(imgs):
+    def get_model_input_data_for_test(self, imgs):
         input0 = torch.cat((imgs[0], imgs[1], imgs[2]), dim=1).cuda()
         input1 = torch.cat((imgs[3], imgs[4], imgs[5]), dim=1).cuda()
         return input0, input1  # for rgb+depth+ir
