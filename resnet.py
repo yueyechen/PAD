@@ -15,7 +15,7 @@ class BasicBlock(nn.Module):
     super(BasicBlock, self).__init__()
     self.conv1 = conv3x3(inplanes, planes, stride)
     self.bn1 = nn.BatchNorm2d(planes)
-    self.relu = nn.ReLU(inplace=True)
+    self.relu = nn.PReLU()
     self.conv2 = conv3x3(planes, planes)
     self.bn2 = nn.BatchNorm2d(planes)
     self.downsample = downsample
@@ -41,7 +41,7 @@ class SELayer(nn.Module):
     self.avg_pool = nn.AdaptiveAvgPool2d(1)
     self.fc = nn.Sequential(
       nn.Linear(channel, channel // reduction, bias=False),
-      nn.ReLU(inplace=True),
+      nn.PReLU(),
 
       nn.Linear(channel // reduction, channel, bias=False),
       nn.Sigmoid()
@@ -62,7 +62,7 @@ class ResNet18(nn.Module):
     self.conv1 = nn.Conv2d(9, planes[0], kernel_size=7, stride=2, padding=3, # 32
                            bias=False)
     self.bn1 = nn.BatchNorm2d(planes[0])
-    self.relu = nn.ReLU(inplace=True)
+    self.relu = nn.PReLU()
 
 
     self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=0, ceil_mode=True)
