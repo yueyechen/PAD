@@ -69,8 +69,7 @@ conf.exp = '' # 指定生成预测文件所在的目录
 
 
 **Step2**： 运行测试脚本
-为了方便测试，可以先下载已经训练好的模型，上传至百度云盘链接：https://pan.baidu.com/s/1WXY_agWo22qMLw6BZL_hKw 
-提取码：0mhv 
+为了方便测试，可以从百度云下载已经训练好的模型; [模型下载地址](https://pan.baidu.com/s/1hpFVDvCeX2ip0LCdVO-8dw) ，提取码：ju0j 
 
 打开终端，切换到该项目下，执行以下命令：
 ```
