@@ -44,8 +44,8 @@ def get_config(training = True):
 #--------------------Inference Config ------------------------
     else:
         conf.test = edict()
-        conf.test.epoch_start = 120
-        conf.test.epoch_end = 121
+        conf.test.epoch_start = 150
+        conf.test.epoch_end = 200
         conf.test.epoch_interval = 8
         conf.test.pred_path = '/home2/xuejiachen/PAD_NEW/work_space/test_pred' #path for save predict result
         conf.test.transform = trans.Compose([
