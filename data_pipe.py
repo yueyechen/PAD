@@ -13,7 +13,7 @@ def get_train_loader(conf):
     return loader
 
 def get_test_loader(conf):
-    print('val dataset: {}'.format(conf.test_list))
+    print('test dataset: {}'.format(conf.test_list))
     ds = MyDataset_huoti_test(conf)
     loader = DataLoader(ds, batch_size=conf.batch_size, shuffle=False, pin_memory=conf.pin_memory, num_workers=conf.num_workers)
     return loader
