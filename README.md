@@ -75,5 +75,5 @@ conf.exp = '' # 指定生成预测文件所在的目录
 python3 test.py
 ```
 
-运行以下命令进行测试，该脚本会针对每个epoch，在目录`${conf.save_path}/${conf.exp}`生成以 `epoch={%d}.txt` 命名的文件。 
+运行以下命令进行测试，该脚本会针对每个epoch，从目录`${conf.save_path}/${conf.exp}`中读取模型并在目录`${conf.test.pred_path}/${conf.exp}`生成以 `epoch={%d}.txt` 命名的文件。 
 
