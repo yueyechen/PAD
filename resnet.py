@@ -55,27 +55,24 @@ class SELayer(nn.Module):
 
 
 class ResNet18(nn.Module):
-  def __init__(self, use_se, embedding_size, block, planes, layers, drop_out, se_reduction=16, num_classes=2):
+  def __init__(self, use_se, embedding_size, block, planes, layers, drop_out, se_reduction=16):
     self.use_se = use_se
-    self.inplanes = planes[0] # 32
+    self.inplanes = planes[0]
     super(ResNet18, self).__init__()
-    self.conv1 = nn.Conv2d(9, planes[0], kernel_size=7, stride=2, padding=3, # 32
+    self.conv1 = nn.Conv2d(5, planes[0], kernel_size=7, stride=2, padding=3,
                            bias=False)
     self.bn1 = nn.BatchNorm2d(planes[0])
     self.relu = nn.PReLU()
 
-
     self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=0, ceil_mode=True)
-    self.layer1 = self._make_layer(block, planes[0], layers[0]) # 32
+    self.layer1 = self._make_layer(block, planes[0], layers[0])
     self.layer2 = self._make_layer(block, planes[1], layers[1], stride=2)
     self.seL2 = SELayer(planes[1], se_reduction)
     self.layer3 = self._make_layer(block, planes[2], layers[2], stride=2)
     self.gap = nn.AdaptiveAvgPool2d(1)
     self.dropout = nn.Dropout(p=drop_out)
     self.fc51 = nn.Linear(planes[2], embedding_size)
-    self.fc61 = nn.Linear(embedding_size, num_classes)
-    self.fc52 = nn.Linear(planes[2], embedding_size)
-    self.fc62 = nn.Linear(embedding_size, num_classes)
+    self.fc61 = nn.Linear(embedding_size, 1)
 
     for m in self.modules():
       if isinstance(m, nn.Conv2d):
@@ -115,12 +112,10 @@ class ResNet18(nn.Module):
     y = self.gap(y)
     y = self.dropout(y)
     y = y.view(y.size(0), -1)
-    y1 = self.fc51(y)
-    y1 = self.fc61(y1)
-    y2 = self.fc52(y)
-    y2 = self.fc62(y2)
+    y = self.fc51(y)
+    y = self.fc61(y)
 
-    return y1,y2
+    return y
 
 def resnet18(use_se=True, embedding_size=1024, drop_out = 0.7, se_reduction = 16):
   model = ResNet18(use_se, embedding_size, BasicBlock,[64,128,256],[1,1,1], drop_out, se_reduction)

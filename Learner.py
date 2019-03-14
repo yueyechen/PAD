@@ -1,6 +1,5 @@
 from data_pipe import get_train_loader,  get_test_loader
 import torch
-import torch.nn.functional as F
 from torch import optim
 from matplotlib import pyplot as plt
 plt.switch_backend('agg')
@@ -10,7 +9,7 @@ import pprint
 from resnet import resnet18
 
 
-os.environ['CUDA_VISIBLE_DEVICES']='7'
+os.environ['CUDA_VISIBLE_DEVICES']='1'
 
 class face_learner(object):
     def __init__(self, conf, inference=False):
@@ -43,8 +42,7 @@ class face_learner(object):
 
     def train(self, conf):
         self.model.train()
-        xent1_losses = AverageMeter()
-        xent2_losses = AverageMeter()
+        SL1_losses = AverageMeter()
         losses = AverageMeter()
 
         save_path = os.path.join(conf.save_path, conf.exp)
@@ -57,25 +55,19 @@ class face_learner(object):
             print('learning rate: {}, {}'.format(len(self.scheduler.get_lr()), self.scheduler.get_lr()[0]))
             for batch_idx, (imgs, labels) in enumerate(self.loader):
                 input = self.get_model_input_data(imgs)
-                labels = labels.cuda()
-                output1, output2 = self.model(input)
-                output = (output1+output2) / 2.0
-                loss_xent1 = conf.train.criterion_xent1(output1, labels)
-                loss_xent2 = conf.train.criterion_xent2(output2, labels)
-                loss = loss_xent1 + loss_xent2
+                labels = labels.cuda().float().unsqueeze(1)
+                output = self.model(input)
+                loss_SL1 = conf.train.criterion_SL1(output, labels)
+                loss = loss_SL1
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
                 losses.update(loss.item(), labels.size(0))
-                xent1_losses.update(loss_xent1.item(), labels.size(0))
-                xent2_losses.update(loss_xent2.item(), labels.size(0))
-                predictions = output.data.max(1)[1]
-                correct = (predictions == labels.data).sum()
-                acc_cur = correct * 100. / labels.size(0)
+                SL1_losses.update(loss_SL1.item(), labels.size(0))
                 if (batch_idx + 1) % self.print_freq == 0:
-                    print("Batch {}/{} Loss {:.6f} ({:.6f}) Acc {:.6f} Xent1_Loss {:.6f} ({:.6f}) Xent2_Loss {:.6f} ({:.6f})" \
-                          .format(batch_idx + 1, len(self.loader), losses.val, losses.avg, acc_cur, xent1_losses.val,
-                                  xent1_losses.avg, xent2_losses.val, xent2_losses.avg))
+                    print("Batch {}/{} Loss {:.6f} ({:.6f}) SL1_Loss {:.6f} ({:.6f})" \
+                          .format(batch_idx + 1, len(self.loader), losses.val, losses.avg, SL1_losses.val,
+                                  SL1_losses.avg))
             self.save_state(save_path, e)
 
     def test(self, conf):
@@ -91,13 +83,9 @@ class face_learner(object):
             with torch.no_grad():
                 for batch_idx, (imgs, names) in enumerate(self.test_loader):
                     input1, input2 = self.get_model_input_data_for_test(imgs)
-                    output11, output12 = self.model(input1)
-                    output21, output22 = self.model(input2)
-                    output11 = F.softmax(output11, dim=1)[:, 1]
-                    output12 = F.softmax(output12, dim=1)[:, 1]
-                    output21 = F.softmax(output21, dim=1)[:, 1]
-                    output22 = F.softmax(output22, dim=1)[:, 1]
-                    output = (output11 + output12 + output21 + output22) / 4.0
+                    output1 = self.model(input1)
+                    output2 = self.model(input2)
+                    output = (output1 + output2 ) / 2.0
                     for k in range(len(names[0])):
                         write_str = names[0][k] + ' ' + names[1][k] + ' ' + names[2][k] + ' ' + '%.12f' % output[k] + '\n'
                         fw.write(write_str)

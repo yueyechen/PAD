@@ -9,13 +9,13 @@ def get_config(training = True):
     conf.eval = edict()
 
     conf.data_folder = '/home2/xuejiachen/data/huoti/align/256x256_v1' #data root for training, and testing
-    conf.result_path = '/home2/xuejiachen/PAD_Pytorch/work_space/result'
-    conf.log_path = '/home2/xuejiachen/PAD_Pytorch/work_space/log' #path for saving loggers in training process
-    conf.save_path = '/home2/xuejiachen/PAD_Pytorch/work_space/save' #path for save model in training process
+    conf.result_path = '/home2/xuejiachen/PAD/work_space/result'
+    conf.log_path = '/home2/xuejiachen/PAD/work_space/log' #path for saving loggers in training process
+    conf.save_path = '/home2/xuejiachen/PAD/work_space/save' #path for save model in training process
     conf.train_list =  '/home2/xuejiachen/data/huoti/align/256x256_v1/quarter_face_train_list.txt' #training list
     conf.test_list = '/home2/xuejiachen/data/huoti/test_list.csv'
     conf.batch_size = 128
-    conf.exp = '030610'
+    conf.exp = 'commit'
 
     conf.model.input_size = [112,112]
     conf.model.random_offset = [16,16] #for random crop
@@ -29,13 +29,12 @@ def get_config(training = True):
 
 #--------------------Training Config ------------------------
     if training:
-        conf.train.lr = 0.1
-        conf.train.milestones = [120, 200, 260]
-        conf.train.epoches = 300
+        conf.train.lr = 0.01
+        conf.train.milestones = [80, 140, 180]
+        conf.train.epoches = 200
         conf.train.momentum = 0.9
         conf.train.gamma = 0.1
-        conf.train.criterion_xent1 = nn.CrossEntropyLoss()
-        conf.train.criterion_xent2 = nn.CrossEntropyLoss()
+        conf.train.criterion_SL1 = nn.SmoothL1Loss()
 
         conf.train.transform = trans.Compose([
             trans.ToTensor(),
@@ -45,14 +44,10 @@ def get_config(training = True):
 #--------------------Inference Config ------------------------
     else:
         conf.test = edict()
-        conf.test.epoch_start = 336
-        conf.test.epoch_end = 360
+        conf.test.epoch_start = 120
+        conf.test.epoch_end = 121
         conf.test.epoch_interval = 8
-        conf.test.pred_path = '/home2/xuejiachen/PAD_Pytorch/work_space/test_pred' #path for save predict result
-        conf.test.transform = trans.Compose([
-            trans.ToTensor(),
-            trans.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-        ])
+        conf.test.pred_path = '/home2/xuejiachen/PAD_NEW/work_space/test_pred' #path for save predict result
         conf.test.transform = trans.Compose([
             trans.ToTensor(),
             trans.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])

@@ -18,12 +18,16 @@ def get_test_loader(conf):
     loader = DataLoader(ds, batch_size=conf.batch_size, shuffle=False, pin_memory=conf.pin_memory, num_workers=conf.num_workers)
     return loader
 
-def default_loader(path):
+def default_loader_rgb(path):
     img = Image.open(path).convert('RGB')
     return img
 
+def default_loader_gray(path):
+    img = Image.open(path).convert('L')
+    return img
+
 class MyDataset_huoti(Dataset):
-    def __init__(self, conf, target_transform=None, loader=default_loader):
+    def __init__(self, conf, target_transform=None, loader_rgb=default_loader_rgb, loader_gray=default_loader_gray):
         fh = open(conf.train_list,'r')
         imgs = []
         for line in fh:
@@ -35,26 +39,23 @@ class MyDataset_huoti(Dataset):
         self.imgs = imgs
         self.transform = conf.train.transform
         self.target_transform = target_transform
-        self.loader = loader
+        self.loader_rgb = loader_rgb
+        self.loader_gray = loader_gray
         self.root = conf.data_folder
         self.input_size = conf.model.input_size
         self.random_offset = conf.model.random_offset
 
     def __getitem__(self, index):
         fn1, fn2, fn3, label = self.imgs[index]
-        img1 = self.loader(os.path.join(self.root,fn1))
-        img2 = self.loader(os.path.join(self.root,fn2))
-        img3 = self.loader(os.path.join(self.root,fn3))
-        if random.random()>0.1:
-            offset_x = random.randint(0, self.random_offset[0])
-            offset_y = random.randint(0, self.random_offset[1])
-            img1 = img1.crop((offset_x, offset_y, offset_x + self.input_size[0], offset_y + self.input_size[1]))
-            img2 = img2.crop((offset_x, offset_y, offset_x + self.input_size[0], offset_y + self.input_size[1]))
-            img3 = img3.crop((offset_x, offset_y, offset_x + self.input_size[0], offset_y + self.input_size[1]))
-        else:
-            img1 = img1.resize((112,112))
-            img2 = img2.resize((112,112))
-            img3 = img3.resize((112,112))
+        img1 = self.loader_rgb(os.path.join(self.root,fn1))
+        img2 = self.loader_gray(os.path.join(self.root,fn2))
+        img3 = self.loader_gray(os.path.join(self.root,fn3))
+
+        offset_x = random.randint(0, self.random_offset[0])
+        offset_y = random.randint(0, self.random_offset[1])
+        img1 = img1.crop((offset_x, offset_y, offset_x + self.input_size[0], offset_y + self.input_size[1]))
+        img2 = img2.crop((offset_x, offset_y, offset_x + self.input_size[0], offset_y + self.input_size[1]))
+        img3 = img3.crop((offset_x, offset_y, offset_x + self.input_size[0], offset_y + self.input_size[1]))
 
         # random horizantal flip
         if random.random() > 0.5:
@@ -74,7 +75,7 @@ class MyDataset_huoti(Dataset):
         return len(self.imgs)
 
 class MyDataset_huoti_test(Dataset):
-    def __init__(self, conf, loader=default_loader):
+    def __init__(self, conf, loader_rgb=default_loader_rgb, loader_gray=default_loader_gray):
         with open(conf.test_list) as f:
             f_csv = csv.reader(f)
             _ = next(f_csv)
@@ -84,31 +85,25 @@ class MyDataset_huoti_test(Dataset):
 
         self.imgs = imgs
         self.transform = conf.test.transform
-        self.loader = loader
+        self.loader_rgb = loader_rgb
+        self.loader_gray = loader_gray
         self.root = conf.data_folder
 
     def __getitem__(self, index):
         fn1, fn2, fn3= self.imgs[index]
-        img11 = self.loader(os.path.join(self.root,fn1))
-        img12 = self.loader(os.path.join(self.root,fn2))
-        img13 = self.loader(os.path.join(self.root,fn3))
-        size_r = (224, 224)
-        size_c = (0, 0, 112, 112)
-        img11 = img11.resize(size_r)
+        img11 = self.loader_rgb(os.path.join(self.root,fn1))
+        img12 = self.loader_gray(os.path.join(self.root,fn2))
+        img13 = self.loader_gray(os.path.join(self.root,fn3))
+        size_c = (8, 8, 120, 120)
         img11 = img11.crop(size_c)
-        img12 = img12.resize(size_r)
         img12 = img12.crop(size_c)
-        img13 = img13.resize(size_r)
         img13 = img13.crop(size_c)
 
-        img21 = self.loader(os.path.join(self.root, fn1)).transpose(Image.FLIP_LEFT_RIGHT)
-        img22 = self.loader(os.path.join(self.root, fn2)).transpose(Image.FLIP_LEFT_RIGHT)
-        img23 = self.loader(os.path.join(self.root, fn3)).transpose(Image.FLIP_LEFT_RIGHT)
-        img21 = img21.resize(size_r)
+        img21 = self.loader_rgb(os.path.join(self.root, fn1)).transpose(Image.FLIP_LEFT_RIGHT)
+        img22 = self.loader_gray(os.path.join(self.root, fn2)).transpose(Image.FLIP_LEFT_RIGHT)
+        img23 = self.loader_gray(os.path.join(self.root, fn3)).transpose(Image.FLIP_LEFT_RIGHT)
         img21 = img21.crop(size_c)
-        img22 = img22.resize(size_r)
         img22 = img22.crop(size_c)
-        img23 = img23.resize(size_r)
         img23 = img23.crop(size_c)
 
         if self.transform is not None:
