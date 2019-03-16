@@ -76,12 +76,13 @@ class MyDataset_huoti(Dataset):
 
 class MyDataset_huoti_test(Dataset):
     def __init__(self, conf, loader_rgb=default_loader_rgb, loader_gray=default_loader_gray):
-        with open(conf.test_list) as f:
-            f_csv = csv.reader(f)
-            _ = next(f_csv)
-            imgs = []
-            for row in f_csv:
-                imgs.append((row[0], row[1], row[2]))
+        fh = open(conf.test_list,'r')
+        imgs = []
+        for line in fh:
+            line = line.strip('\n')
+            line = line.rstrip()
+            words = line.split()
+            imgs.append((words[0], words[1], words[2]))
 
         self.imgs = imgs
         self.transform = conf.test.transform
