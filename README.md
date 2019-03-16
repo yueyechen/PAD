@@ -3,7 +3,7 @@
 ## 1.数据集
 本项目的数据来源于 Chalearn CASIA-SURF[1](https://competitions.codalab.org/competitions/20853#learn_the_details) 
 
-对CASIA数据集进行基本的预处理，并将数据上传至百度云盘[下载地址](链接：https://pan.baidu.com/s/1_caiA9r9SPjRI09fNKsscg);提取码：9ooz 
+对CASIA数据集进行基本的预处理，并将数据上传至百度云盘[下载地址](https://pan.baidu.com/s/1_caiA9r9SPjRI09fNKsscg);提取码：9ooz 
 
 百度云盘包括训练集、测试集以及训练集的list、测试集的list，请自行下载解压到 conf.data_folder 指定的目录下，并请确保conf.train_list，conf.test_list 的路径与实际放置的路径一致。
 
