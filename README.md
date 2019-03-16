@@ -3,11 +3,9 @@
 ## 1.数据集
 本项目的数据来源于 Chalearn CASIA-SURF[1](https://competitions.codalab.org/competitions/20853#learn_the_details) 
 
-对CASIA数据集进行基本的预处理，并将数据上传至百度云盘[下载地址](https://pan.baidu.com/s/1uKopv4uTpALKKPqzuFBOyg);提取码：d27c 
+对CASIA数据集进行基本的预处理，并将数据上传至百度云盘[下载地址](链接：https://pan.baidu.com/s/1_caiA9r9SPjRI09fNKsscg);提取码：9ooz 
 
-
-
-数据集下载后，将训练数据和测试数据解压到`data`目录下，
+百度云盘包括训练集、测试集以及训练集的list、测试集的list，请自行下载解压到 conf.data_folder 指定的目录下，并请确保conf.train_list，conf.test_list 的路径与实际放置的路径一致。
 
 ## 2.环境配置
 ### 2.1 环境描述
@@ -51,7 +49,7 @@ python3 train.py # 训练脚本
 
 
 
-程序运行完毕以后，会在save目录下生成训练模型，在log目录下记录训练情况。
+程序运行完毕以后，会在`conf.save_path/conf.exp`目录下生成训练模型.
 
 ## 4. 测试
 
@@ -61,19 +59,24 @@ python3 train.py # 训练脚本
 
 ```python
 
-conf.val_list = '<test_list.txt>' # 测试文件索引
-conf.save_path = '/test_pred' # 指定生成预测文件的根目录，默认在当前文件的test_pred 目录下
+conf.save_path = './work_space/test_pred' # 指定生成预测文件的根目录，默认在当前工程目录的 `work_space/test_pred` 目录下
 conf.exp = '' # 指定生成预测文件所在的目录
 
 ```
 
 **Step2**： 运行测试脚本
 为了方便测试，可以从百度云下载已经训练好的模型; [模型下载地址](https://pan.baidu.com/s/1c2KmizAjfduiuqw2xpCb6A ) ，提取码：ah6x 
-
+  为了快速复现我们的实验结果，可以直接将模型改名为`epoch=1.pth`,并且放置到`conf.save_path/conf.exp/.`路径下，然后设置config.py中的相关参数，包括：
+```
+conf.test.epoch_start=1
+conf.test.epoch_end=2
+conf.test.interval=1
+```
+请确保conf.data_folder和conf.test_list设置正确。
 打开终端，切换到该项目下，执行以下命令：
 ```
 python3 test.py
 ```
 
-运行以下命令进行测试，该脚本会针对每个epoch，从目录`${conf.save_path}/${conf.exp}`中读取模型并在目录`${conf.test.pred_path}/${conf.exp}`生成以 `epoch={%d}.txt` 命名的文件。 
+运行以下命令进行测试，该脚本会针对每个epoch，从目录`${conf.save_path}/${conf.exp}`中读取模型并在目录`${conf.test.pred_path}/${conf.exp}`生成以 `epoch={%d}.txt` 命名的文件，每个 txt 文件保存了在测试集上的预测结果。
 
