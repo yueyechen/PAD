@@ -1,0 +1,5 @@
+numpy==1.14.3
+Pillow
+easydict
+PIL==5.1.0
+torch=0.41
