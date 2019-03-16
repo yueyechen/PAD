@@ -13,7 +13,7 @@ def get_config(training = True):
     conf.train_list =  'quarter_face_train_list.txt' #path where training list is, you should change it according to your setting
     conf.test_list = 'test_public_list.txt' #path where test list is, you should change it according to your setting
     conf.batch_size = 128
-    conf.exp = 'commit' #model is save in conf.save_path/conf.exp
+    conf.exp = 'commit' #model is saved in conf.save_path/conf.exp, if you want to train different models, you can distinguish them according to this parameter
 
     conf.model.input_size = [112,112] #the input size of our model
     conf.model.random_offset = [16,16] #for random crop
