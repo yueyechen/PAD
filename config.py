@@ -8,12 +8,12 @@ def get_config(training = True):
     conf.train = edict()
     conf.eval = edict()
 
-    conf.data_folder = 'path to data root' #data root for training, and testing, you should change is according with your setting
+    conf.data_folder = 'data folder root' #data root for training, and testing, you should change is according with your setting
     conf.save_path = './work_space/save' #path for save model in training process, you should change it according with your setting
     conf.train_list =  'quarter_face_train_list.txt' #path where training list is, you should change it according with your setting
     conf.test_list = 'test_public_list.txt' #path where test list is, you should change it according with your setting
     conf.batch_size = 128
-    conf.exp = 'commit'
+    conf.exp = 'commit' #model is save in conf.save_path/conf.exp
 
     conf.model.input_size = [112,112] #the input size of our model
     conf.model.random_offset = [16,16] #for random crop
@@ -45,7 +45,7 @@ def get_config(training = True):
         conf.test.epoch_start = 150
         conf.test.epoch_end = 200
         conf.test.epoch_interval = 8 #we set a range of epoches for testing
-        conf.test.pred_path = '/home2/xuejiachen/PAD/work_space/test_pred' #path for save predict result,you should change it according with your setting
+        conf.test.pred_path = '/home2/xuejiachen/PAD/work_space/test_pred' #path for save predict result, pred_result is saved in conf.pred_path/conf.exp, you should change it according with your setting
         conf.test.transform = trans.Compose([ #convert input from PIL.Image to Tensor and normalized
             trans.ToTensor(),
             trans.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
